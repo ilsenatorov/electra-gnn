@@ -1,0 +1,6 @@
+.*
+!.gitignore
+*.ipynb
+data/
+raw_data/
+*cache*
