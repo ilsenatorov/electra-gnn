@@ -4,3 +4,5 @@
 data/
 raw_data/
 *cache*
+tb_logs/
+lightning_logs/
