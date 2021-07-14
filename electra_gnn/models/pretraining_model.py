@@ -41,8 +41,8 @@ class PretrainingModel(LightningModule):
         corrupt_batch = corrupt_molecules(batch, generated_features.argmax(axis=1), masked_idx)
         disc_prediction = self.discriminator(corrupt_batch)
         corruption_labels = torch.zeros((batch.num_nodes, 1), dtype=torch.float32, device=self.device)
-        corruption_labels[masked_idx] = 1.
-        disc_loss = self.disc_loss(corruption_labels, disc_prediction)
+        corruption_labels[masked_idx] = 1
+        disc_loss = self.disc_loss(disc_prediction, corruption_labels)
         discoptim.zero_grad()
         self.manual_backward(disc_loss)
         discoptim.step()
