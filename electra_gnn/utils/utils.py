@@ -2,9 +2,11 @@ from math import ceil
 import numpy as np
 import torch
 from copy import deepcopy
+import torch_geometric
 
 
-def mask_molecules(orig_data, mask_ratio=0.2):
+def mask_molecules(orig_data: torch_geometric.data.Data,
+                   mask_ratio: float = 0.2  ):
     data = deepcopy(orig_data)
     num_nodes = data.num_nodes
     num_masked_nodes = ceil(num_nodes * mask_ratio)
@@ -17,5 +19,5 @@ def mask_molecules(orig_data, mask_ratio=0.2):
 def corrupt_molecules(orig_data, new_features, masked_idx):
     data = deepcopy(orig_data)
     data.x[masked_idx] = new_features
-    data.corrupt_idx = masked_idx
+    data.masked_idx = masked_idx
     return data

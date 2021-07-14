@@ -6,6 +6,19 @@ from torch_geometric.data import DataLoader
 from electra_gnn.models.pretraining_model import PretrainingModel
 from electra_gnn.utils.data import MoleculeDataset
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('data', type=str)
+parser.add_argument('--batch_size', type=int, default=1024)
+parser.add_argument('--num_workers', type=int, default=8)
+parser.add_argument('--gen_lr', type=float, default=0.001)
+parser.add_argument('--disc_lr', type=float, default=0.001)
+parser.add_argument('--gen_hidden_dim', type=int, default=16)
+parser.add_argument('--disc_hidden_dim', type=int, default=64)
+parser.add_argument('--mask_ratio', type=float, default=0.2)
+args = vars(parser.parse_args())
+
+
 logger = TensorBoardLogger('tb_logs',
                            name='electra',
                            default_hp_metric=False)
@@ -23,9 +36,10 @@ trainer = Trainer(gpus=1,
                   )
 
 
-dataset = MoleculeDataset('raw_data/chembl_smiles.csv')
-model = PretrainingModel()
+dataset = MoleculeDataset(args['data'])
+model = PretrainingModel(**args)
+print(model)
 trainer = Trainer(gpus=1)
-dataloader = DataLoader(dataset, batch_size=512, shuffle=True, num_workers=8)
+dataloader = DataLoader(dataset, batch_size=4096, shuffle=True, num_workers=8)
 
 trainer.fit(model, dataloader)

@@ -1,3 +1,4 @@
+from electra_gnn.utils.feat import featurize
 from os import path as osp
 
 import numpy as np
@@ -6,6 +7,7 @@ import torch
 from deepchem.feat import MolGraphConvFeaturizer
 from torch.utils import data
 from torch_geometric.data import InMemoryDataset
+from .feat import featurize
 
 
 class MoleculeDataset(InMemoryDataset):
@@ -24,9 +26,8 @@ class MoleculeDataset(InMemoryDataset):
     def process(self):
         df = pd.read_csv(self.filename)
         assert('smiles' in df.columns)
-        featuriser = MolGraphConvFeaturizer()
-        data_list = featuriser.featurize(df['smiles'])
-        data_list = [x.to_pyg_graph() for x in data_list if not isinstance(x, np.ndarray)]
+        data_list = [featurize(molecule) for molecule in df['smiles'].to_list()]
+        data_list = [molecule for molecule in data_list if molecule is not None]
 
         if self.pre_filter is not None:
             data_list = [data for data in data_list if self.pre_filter(data)]
