@@ -1,4 +1,4 @@
-from finetuning_model import (FinetuningClassificationModel,
+from .finetuning_model import (FinetuningClassificationModel,
                               FinetuningRegressionModel)
 
 from .discriminator import Discriminator
