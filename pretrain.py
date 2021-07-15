@@ -1,12 +1,13 @@
+import argparse
+
 from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from torch_geometric.data import DataLoader
 
 from electra_gnn.models.pretraining_model import PretrainingModel
 from electra_gnn.utils.data import MoleculeDataset
 
-import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('data', type=str)
 parser.add_argument('--batch_size', type=int, default=1024)

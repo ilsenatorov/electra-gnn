@@ -1,12 +1,14 @@
+import argparse
+
 from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from torch_geometric.data import DataLoader
 
-from electra_gnn.models.finetuning_model import FinetuningClassificationModel, FinetuningRegressionModel
+from electra_gnn.models.finetuning_model import (FinetuningClassificationModel,
+                                                 FinetuningRegressionModel)
 from electra_gnn.utils.data import MoleculeDataset, split_dataset
 
-import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('data', type=str)
 parser.add_argument('--pretrained_model_file', type=str, default=None,
@@ -28,7 +30,7 @@ callbacks = [
                     save_top_k=3,
                     mode='min'),
     EarlyStopping(monitor='val_loss',
-                  patience=10,
+                  patience=100,
                   mode='min')
 ]
 trainer = Trainer(gpus=1,
@@ -46,4 +48,4 @@ model = {'class': FinetuningClassificationModel, 'reg': FinetuningRegressionMode
 model = model(**args)
 
 trainer.fit(model, train_dataloader, val_dataloader)
-train.test(model, test_dataloader=test_dataloader)
+trainer.test(model, test_dataloader=test_dataloader)

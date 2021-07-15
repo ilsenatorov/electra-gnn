@@ -1,12 +1,12 @@
-from pytorch_lightning import LightningModule
-from .generator import Generator
-from .discriminator import Discriminator
-from ..utils import mask_molecules, corrupt_molecules
 import torch
 import torch.nn.functional as F
+from pytorch_lightning import LightningModule
 from torch.optim import Adam
-
 from torchmetrics.functional import accuracy
+
+from ..utils import corrupt_molecules, mask_molecules
+from .discriminator import Discriminator
+from .generator import Generator
 
 
 class PretrainingModel(LightningModule):

@@ -1,12 +1,13 @@
+from copy import deepcopy
 from math import ceil
+
 import numpy as np
 import torch
-from copy import deepcopy
 import torch_geometric
 
 
 def mask_molecules(orig_data: torch_geometric.data.Data,
-                   mask_ratio: float = 0.2  ):
+                   mask_ratio: float = 0.2):
     data = deepcopy(orig_data)
     num_nodes = data.num_nodes
     num_masked_nodes = ceil(num_nodes * mask_ratio)

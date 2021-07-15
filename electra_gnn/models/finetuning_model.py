@@ -1,14 +1,17 @@
+import torch
+import torch.nn.functional as F
 from numpy.core.fromnumeric import mean
 from pytorch_lightning import LightningModule
 from torch.nn.modules.linear import Linear
-from .generator import Generator
-from .discriminator import Discriminator
-import torch
-import torch.nn.functional as F
-from torch.optim import Adam
-from .pretraining_model import PretrainingModel
+from torch.optim import Adam, lr_scheduler
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch_geometric.nn import global_add_pool
-from torchmetrics.functional import accuracy, auroc, explained_variance, mean_absolute_error
+from torchmetrics.functional import (accuracy, auroc, explained_variance,
+                                     mean_absolute_error)
+
+from .discriminator import Discriminator
+from .generator import Generator
+from .pretraining_model import PretrainingModel
 
 
 class FinetuningClassificationModel(LightningModule):
@@ -36,7 +39,9 @@ class FinetuningClassificationModel(LightningModule):
         return x
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.hparams.lr)
+        optim = Adam(self.parameters(), lr=self.hparams.lr)
+        lr_sched = ReduceLROnPlateau(optim, mode='min', factor=0.1, patience=40, verbose=True)
+        return {'optimizer': optim, 'lr_scheduler': {"scheduler": lr_sched, 'monitor': 'val_loss'}}
 
     def shared_step(self, batch):
         out = self.forward(batch)
