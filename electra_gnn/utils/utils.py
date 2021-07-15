@@ -19,5 +19,5 @@ def mask_molecules(orig_data: torch_geometric.data.Data,
 def corrupt_molecules(orig_data, new_features, masked_idx):
     data = deepcopy(orig_data)
     data.x[masked_idx] = new_features
-    data.masked_idx = masked_idx
+    data.y = (orig_data.x != data.x).long().unsqueeze(1)
     return data
