@@ -15,6 +15,7 @@ parser.add_argument('--gen_lr', type=float, default=0.001)
 parser.add_argument('--disc_lr', type=float, default=0.001)
 parser.add_argument('--gen_hidden_dim', type=int, default=16)
 parser.add_argument('--disc_hidden_dim', type=int, default=64)
+parser.add_argument('--atom_embedding_dim', type=int, default=16)
 parser.add_argument('--mask_ratio', type=float, default=0.2)
 args = vars(parser.parse_args())
 
@@ -39,7 +40,6 @@ trainer = Trainer(gpus=1,
 dataset = MoleculeDataset(args['data'])
 model = PretrainingModel(**args)
 print(model)
-trainer = Trainer(gpus=1)
-dataloader = DataLoader(dataset, batch_size=4096, shuffle=True, num_workers=8)
+dataloader = DataLoader(dataset, batch_size=args['batch_size'], shuffle=True, num_workers=args['num_workers'])
 
 trainer.fit(model, dataloader)

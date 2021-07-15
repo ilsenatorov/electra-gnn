@@ -10,7 +10,7 @@ class Generator(LightningModule):
                  atom_embedding_dim=30,
                  hidden_dim=16):
         super().__init__()
-        self.embedding = Embedding(num_atom_types, atom_embedding_dim)
+        self.embedding = Embedding(num_atom_types, atom_embedding_dim, padding_idx=0)
         self.gcn1 = GCNConv(atom_embedding_dim, hidden_dim)
         self.gcn2 = GCNConv(hidden_dim, hidden_dim)
         self.lin = Linear(hidden_dim, num_atom_types)
@@ -20,6 +20,6 @@ class Generator(LightningModule):
         x = self.embedding(x)
         x = F.relu(self.gcn1(x, edge_index))
         x = F.relu(self.gcn2(x, edge_index))
-        x=x[data.masked_idx]
-        x=self.lin(x)
+        x = x[data.masked_idx]
+        x = self.lin(x)
         return x

@@ -6,10 +6,12 @@ import torch
 import torch.nn.functional as F
 from torch.optim import Adam
 
+from torchmetrics.functional import accuracy
+
 
 class PretrainingModel(LightningModule):
     def __init__(self,
-                 num_atom_types=60,
+                 num_atom_types=29,
                  atom_embedding_dim=30,
                  gen_hidden_dim=16,
                  disc_hidden_dim=32,
@@ -19,6 +21,7 @@ class PretrainingModel(LightningModule):
         self.save_hyperparameters()
         self.generator = Generator(num_atom_types, atom_embedding_dim, hidden_dim=gen_hidden_dim)
         self.discriminator = Discriminator(num_atom_types, atom_embedding_dim, hidden_dim=disc_hidden_dim)
+        self.discriminator.embedding = self.generator.embedding  # tie embedding weights
         self.gen_loss = torch.nn.CrossEntropyLoss()
         self.disc_loss = torch.nn.BCEWithLogitsLoss()
         self.automatic_optimization = False
@@ -46,7 +49,13 @@ class PretrainingModel(LightningModule):
         discoptim.zero_grad()
         self.manual_backward(disc_loss)
         discoptim.step()
-        self.log_dict({'gen_loss': gen_loss, 'disc_loss': disc_loss, 'loss': gen_loss+disc_loss})
+        acc = accuracy(disc_prediction, corruption_labels.long())
+        self.log_dict({
+            'gen_loss': gen_loss,
+            'disc_loss': disc_loss,
+            'disc_acc': acc,
+            'loss': gen_loss+disc_loss
+        })
 
     def configure_optimizers(self):
         genoptim = Adam(self.generator.parameters(), lr=self.hparams.gen_lr)
